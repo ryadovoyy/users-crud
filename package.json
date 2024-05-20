@@ -1,0 +1,28 @@
+{
+  "name": "users-crud",
+  "version": "1.0.0",
+  "description": "Users CRUD",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ryadovoyy/users-crud.git"
+  },
+  "author": "ryadovoy",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ryadovoyy/users-crud/issues"
+  },
+  "homepage": "https://github.com/ryadovoyy/users-crud#readme",
+  "devDependencies": {
+    "@types/node": "^20.12.12"
+  },
+  "dependencies": {
+    "knex": "^3.1.0",
+    "sqlite3": "^5.1.7"
+  }
+}

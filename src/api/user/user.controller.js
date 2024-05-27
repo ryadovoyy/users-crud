@@ -1,3 +1,4 @@
+import { HttpException } from '../../shared/utils/http-exception.js';
 import * as userRepository from './user.repository.js';
 
 export const findAll = async (req, res, next) => {
@@ -14,13 +15,13 @@ export const create = async (req, res, next) => {
 
     try {
         if (!name || !age) {
-            return res.status(400).json({ message: 'Name and age are required' });
+            throw new HttpException('Name and age are required', 400);
         }
 
         const parsedAge = parseInt(age);
 
         if (isNaN(parsedAge)) {
-            return res.status(400).json({ message: 'Please enter correct age' });
+            throw new HttpException('Please enter correct age', 400);
         }
 
         const user = { name, age: parsedAge };
@@ -37,7 +38,7 @@ export const findOne = async (req, res, next) => {
         const user = await userRepository.findById(req.params.id);
 
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            throw new HttpException('User not found', 404);
         }
 
         res.json(user);
@@ -51,7 +52,7 @@ export const update = async (req, res, next) => {
 
     try {
         if (!name && !age) {
-            return res.status(400).json({ message: 'Name or age is required' });
+            throw new HttpException('Name or age is required', 400);
         }
 
         const updatedData = {};
@@ -64,7 +65,7 @@ export const update = async (req, res, next) => {
             const parsedAge = parseInt(age);
 
             if (isNaN(parsedAge)) {
-                return res.status(400).json({ message: 'Please enter correct age' });
+                throw new HttpException('Please enter correct age', 400);
             }
 
             updatedData.age = parsedAge;
@@ -73,7 +74,7 @@ export const update = async (req, res, next) => {
         const updatedUser = await userRepository.update(req.params.id, updatedData);
 
         if (!updatedUser) {
-            return res.status(404).json({ message: 'User not found' });
+            throw new HttpException('User not found', 404);
         }
 
         res.json(updatedUser);
@@ -87,7 +88,7 @@ export const remove = async (req, res, next) => {
         const success = await userRepository.remove(req.params.id);
 
         if (!success) {
-            return res.status(404).json({ message: 'User not found' });
+            throw new HttpException('User not found', 404);
         }
 
         res.status(204).end();

@@ -1,9 +1,9 @@
 import knex from 'knex';
 
 const db = knex({
-    client: 'sqlite3',
+    client: process.env.DB_CLIENT,
     connection: {
-        filename: './src/shared/db/data.db'
+        filename: process.env.DB_CONNECTION_FILENAME
     }
 });
 

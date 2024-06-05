@@ -1,3 +1,5 @@
 /node_modules
+/build
 /src/shared/db/data.db
-.env
+.env.dev
+.env.prod

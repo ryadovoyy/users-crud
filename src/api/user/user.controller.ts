@@ -1,16 +1,21 @@
-import { HttpException } from '../../shared/utils/http-exception.js';
-import * as userRepository from './user.repository.js';
+import { RequestHandler } from 'express';
 
-export const findAll = async (req, res, next) => {
+import { HttpException } from '../../shared/utils/http-exception';
+import { dataSource } from '../../shared/db/data-source';
+import { User } from './user.model';
+
+const userRepository = dataSource.getRepository(User);
+
+export const findAll: RequestHandler = async (_, res, next) => {
     try {
-        const users = await userRepository.findAll();
+        const users = await userRepository.find();
         res.json(users);
     } catch (err) {
         next(err);
     }
 };
 
-export const create = async (req, res, next) => {
+export const create: RequestHandler = async (req, res, next) => {
     const { name, age } = req.body;
 
     try {
@@ -18,14 +23,14 @@ export const create = async (req, res, next) => {
             throw new HttpException('Name and age are required', 400);
         }
 
-        const parsedAge = parseInt(age);
+        const parsedAge = +age;
 
         if (isNaN(parsedAge)) {
             throw new HttpException('Please enter correct age', 400);
         }
 
-        const user = { name, age: parsedAge };
-        const createdUser = await userRepository.save(user);
+        const createdUser = userRepository.create({ name, age: parsedAge });
+        await userRepository.save(createdUser);
 
         res.status(201).json(createdUser);
     } catch (err) {
@@ -33,9 +38,9 @@ export const create = async (req, res, next) => {
     }
 };
 
-export const findOne = async (req, res, next) => {
+export const findOne: RequestHandler = async (req, res, next) => {
     try {
-        const user = await userRepository.findById(req.params.id);
+        const user = await userRepository.findOneBy({ id: +req.params.id });
 
         if (!user) {
             throw new HttpException('User not found', 404);
@@ -47,7 +52,7 @@ export const findOne = async (req, res, next) => {
     }
 };
 
-export const update = async (req, res, next) => {
+export const update: RequestHandler = async (req, res, next) => {
     const { name, age } = req.body;
 
     try {
@@ -55,14 +60,14 @@ export const update = async (req, res, next) => {
             throw new HttpException('Name or age is required', 400);
         }
 
-        const updatedData = {};
+        const updatedData: Partial<User> = {};
 
         if (name) {
             updatedData.name = name;
         }
 
         if (age) {
-            const parsedAge = parseInt(age);
+            const parsedAge = +age;
 
             if (isNaN(parsedAge)) {
                 throw new HttpException('Please enter correct age', 400);
@@ -71,11 +76,16 @@ export const update = async (req, res, next) => {
             updatedData.age = parsedAge;
         }
 
-        const updatedUser = await userRepository.update(req.params.id, updatedData);
+        const updateResult = await userRepository.update(req.params.id, updatedData);
 
-        if (!updatedUser) {
+        if (updateResult.affected === 0) {
             throw new HttpException('User not found', 404);
         }
+
+        const updatedUser = {
+            id: +req.params.id,
+            ...updatedData
+        };
 
         res.json(updatedUser);
     } catch (err) {
@@ -83,11 +93,11 @@ export const update = async (req, res, next) => {
     }
 };
 
-export const remove = async (req, res, next) => {
+export const remove: RequestHandler = async (req, res, next) => {
     try {
-        const success = await userRepository.remove(req.params.id);
+        const deleteResult = await userRepository.delete(req.params.id);
 
-        if (!success) {
+        if (deleteResult.affected === 0) {
             throw new HttpException('User not found', 404);
         }
 

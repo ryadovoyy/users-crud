@@ -1,8 +1,8 @@
 import express from 'express';
 
-import router from './api/router.js';
-import { notFoundHandler } from './middleware/not-found-handler.js';
-import { errorHandler } from './middleware/error-handler.js';
+import router from './api/router';
+import { notFoundHandler } from './middleware/not-found-handler';
+import { errorHandler } from './middleware/error-handler';
 
 const app = express();
 
